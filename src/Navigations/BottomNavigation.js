@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { AddPkg } from "../Screens/Admin/AddPkg";
+import { AddPkg } from "../Screens/Admin/AddRidePkg";
 import { AddTaxi } from "../Screens/Admin/AddTaxi";
 import { AllRides } from "../Screens/Admin/AllRides";
 import MyTabBar from "./MytabBar";

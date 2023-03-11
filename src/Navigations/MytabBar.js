@@ -9,7 +9,7 @@ function MyTabBar({ state, descriptors, navigation }) {
         flexDirection: "row",
         height: 60,
         width: "100%",
-        backgroundColor: "#1c1c1b",
+        backgroundColor: "#6750a4",
         alignItems: "center",
         borderTopLeftRadius: 10,
         borderTopRightRadius: 10,
@@ -63,9 +63,9 @@ function MyTabBar({ state, descriptors, navigation }) {
                     : "road"
                 }
                 size={24}
-                color={isFocused ? "#f0ece4" : "#FFF"}
+                color={isFocused ? "#292b2b" : "#FFF"}
               />
-              <Text style={{ color: isFocused ? "#f0ece4" : "#FFF" }}>
+              <Text style={{ color: isFocused ? "#292b2b" : "#FFF" }}>
                 {label}
               </Text>
             </TouchableOpacity>

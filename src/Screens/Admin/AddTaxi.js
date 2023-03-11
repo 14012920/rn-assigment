@@ -10,12 +10,23 @@ import { Button, Text, TextInput, HelperText } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { useAdmin } from "../../CustomHooks/useAdmin";
 import { DefaultTheme, Modal, Portal } from "react-native-paper";
+import {
+  addDoc,
+  collection,
+  doc,
+  setDoc,
+  deleteDoc,
+  updateDoc,
+} from "firebase/firestore";
 import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import Header from "../../Components/Header";
+import Db from "../../Config/Db";
 export const AddTaxi = () => {
   const { getTaxi } = useAdmin();
   const [taxiName, setTaxiName] = useState("");
   const [taxiNumber, setTaxiNumber] = useState("");
+  const [selectedItem, setSelectedItem] = useState(null);
+
   const [isActive, setIsActive] = useState(false);
   const [visible, setVisible] = useState(false);
   const [allTaxi, setAllTaxi] = useState([]);
@@ -57,17 +68,61 @@ export const AddTaxi = () => {
   // }, [email, password]);
 
   const onPressAdd = async () => {
-    const data = await checkLoggedIn("bharat@gmail.com");
-    if (data) {
-      navigation.navigate("Home");
-    } else {
-      alert("check your email and password");
+    try {
+      if (selectedItem != null) {
+        const docRef = doc(Db, "taxi", selectedItem?.id);
+        updateDoc(
+          docRef,
+          { taxiName: taxiName, taxiNumber: taxiNumber },
+          { merge: true }
+        );
+        getAllTaxi();
+        setSelectedItem(null);
+        setTaxiName("");
+        setTaxiNumber("");
+        setVisible(false);
+      } else {
+        await addDoc(collection(Db, "taxi"), {
+          taxiName: taxiName,
+          taxiNumber: taxiNumber,
+        });
+        getAllTaxi();
+        setVisible(false);
+      }
+    } catch (error) {
+      console.log("ERrror", error);
     }
+
+    // const data = await checkLoggedIn("bharat@gmail.com");
+    // if (data) {
+    //   navigation.navigate("Home");
+    // } else {
+    //   alert("check your email and password");
+    // }
+    //
+  };
+
+  const onPressDelete = async (id) => {
+    try {
+      await deleteDoc(doc(Db, "taxi", id));
+
+      getAllTaxi();
+    } catch (error) {
+      console.log("ERrror", error);
+    }
+
+    // const data = await checkLoggedIn("bharat@gmail.com");
+    // if (data) {
+    //   navigation.navigate("Home");
+    // } else {
+    //   alert("check your email and password");
+    // }
     //
   };
 
   const getAllTaxi = async () => {
     const data = await getTaxi();
+    console.log("Taxi", data);
     setAllTaxi(data);
   };
   useEffect(() => {
@@ -81,6 +136,12 @@ export const AddTaxi = () => {
     width: "92%",
     alignSelf: "center",
     borderRadius: 10,
+  };
+  const onPressEdit = (item) => {
+    setSelectedItem(item);
+    setTaxiName(item?.taxiName);
+    setTaxiNumber(item?.taxiNumber);
+    showModal(true);
   };
   const renderTaxiCard = ({ item }) => (
     <View
@@ -101,15 +162,29 @@ export const AddTaxi = () => {
         <Text>{item?.taxiName}</Text>
       </View>
       <View style={{ flexDirection: "row" }}>
-        <MaterialIcons name="delete" size={24} color="black" />
-        <Entypo name="edit" size={24} color="black" />
+        <MaterialIcons
+          name="delete"
+          size={24}
+          color="black"
+          onPress={() => onPressDelete(item.id)}
+        />
+        <Entypo
+          name="edit"
+          size={24}
+          color="black"
+          onPress={() => onPressEdit(item)}
+        />
       </View>
     </View>
   );
 
   return (
     <View style={styles.container}>
-      <Header title="TAXI" onPressButton={() => showModal(true)} />
+      <Header
+        title="TAXI"
+        rightButtonTitle="Add Taxi"
+        onPressButton={() => showModal(true)}
+      />
       <FlatList data={allTaxi} renderItem={renderTaxiCard} />
       <Modal
         visible={visible}
@@ -127,27 +202,28 @@ export const AddTaxi = () => {
             <Text
               style={{ alignSelf: "center", fontSize: 20, fontWeight: "bold" }}
             >
-              Add New Taxi
+              {selectedItem ? "Update Taxi" : "Add New Taxi"}
             </Text>
             <Pressable onPress={hideModal}>
               <Entypo name="cross" size={24} color="black" />
             </Pressable>
           </View>
           <TextInput
+            value={taxiName}
             style={{ marginVertical: 20 }}
             label="Add Taxi Name"
             keyboardType="email-address"
-            onChangeText={(text) => validateTaxiName(text)}
+            onChangeText={(text) => setTaxiName(text)}
           />
 
           <HelperText type="error" visible={nameError} fontSize={10}>
             Please enter valid name/modal
           </HelperText>
           <TextInput
+            value={taxiNumber}
             style={{ marginBottom: 20 }}
-            secureTextEntry
             label="Taxi Number"
-            onChangeText={(text) => validateTaxiNumber(text)}
+            onChangeText={(text) => setTaxiNumber(text)}
           />
           <HelperText type="error" visible={numberError} fontSize={10}>
             Please Enter correct Taxi number
@@ -155,7 +231,7 @@ export const AddTaxi = () => {
           <Button
             mode="contained"
             onPress={() => onPressAdd()}
-            disabled={isActive}
+            disabled={false}
           >
             Add
           </Button>
