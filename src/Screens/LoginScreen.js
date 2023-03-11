@@ -5,18 +5,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { loggedIn } from "../Redux/Actions/AuthAction";
 import { Button, Text, TextInput, HelperText } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
+import { useAdmin } from "../CustomHooks/useAdmin";
 
 export const LoginScreen = () => {
+  const { checkLoggedIn } = useAdmin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isActive, setIsActive] = useState(true);
+  const [isActive, setIsActive] = useState(false);
 
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
 
-  const dispatch = useDispatch();
   const navigation = useNavigation();
-  const login = useSelector((state) => state.auth);
   const validateEmail = (text) => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
     if (reg.test(text) === false) {
@@ -39,26 +39,27 @@ export const LoginScreen = () => {
       setPasswordError(false);
     }
   };
-  useEffect(() => {
-    if (
-      email.length > 0 &&
-      password.length > 0 &&
-      !emailError &&
-      !passwordError
-    ) {
-      setIsActive(false);
-    }
-  }, [email, password]);
+  // useEffect(() => {
+  //   if (
+  //     email.length > 0 &&
+  //     password.length > 0 &&
+  //     !emailError &&
+  //     !passwordError
+  //   ) {
+  //     setIsActive(false);
+  //   }
+  // }, [email, password]);
 
-  const onPressLogin = () => {
-    dispatch(loggedIn({ email: email, password: password }));
-    navigation.navigate("Home");
-  };
-  useEffect(() => {
-    if (login?.email) {
+  const onPressLogin = async () => {
+    const data = await checkLoggedIn("bharat@gmail.com");
+    if (data) {
       navigation.navigate("Home");
+    } else {
+      alert("check your email and password");
     }
-  }, []);
+    //
+  };
+  useEffect(() => {}, []);
   return (
     <View style={styles.container}>
       <View style={styles.loginContainer}>
