@@ -34,7 +34,21 @@ export const useAdmin = () => {
   const getPackage = async () => {
     let data = [];
     try {
-      const pkgRef = collection(Db, "package");
+      const pkgRef = collection(Db, "taxiPkg");
+      const querySnapshot = await getDocs(pkgRef);
+      querySnapshot.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
+      });
+      return data;
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const getAllRides = async () => {
+    let data = [];
+    try {
+      const pkgRef = collection(Db, "rides");
       const querySnapshot = await getDocs(pkgRef);
       querySnapshot.forEach((doc) => {
         data.push({ ...doc.data(), id: doc.id });
@@ -49,5 +63,6 @@ export const useAdmin = () => {
     checkLoggedIn,
     getTaxi,
     getPackage,
+    getAllRides,
   };
 };

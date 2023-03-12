@@ -16,7 +16,7 @@ export const AddPkg = () => {
     <View>
       <Header
         title="All Package"
-        rightButtonTitle="Generate Excel"
+        rightButtonTitle=""
         onPressButton={() => shareExcel()}
       />
     </View>

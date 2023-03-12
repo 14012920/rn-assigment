@@ -48,7 +48,7 @@ function MyTabBar({ state, descriptors, navigation }) {
         };
 
         return (
-          <View>
+          <View key={index}>
             <TouchableOpacity
               onPress={onPress}
               onLongPress={onLongPress}
@@ -60,6 +60,8 @@ function MyTabBar({ state, descriptors, navigation }) {
                     ? "package"
                     : label === "Taxi"
                     ? "car"
+                    : label === "Profile"
+                    ? "account"
                     : "road"
                 }
                 size={24}
